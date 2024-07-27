@@ -1,6 +1,7 @@
 import tkinter as tk
 from PIL import ImageGrab
 import pyautogui
+import os
 
 class ScreenCaptureApp:
     def __init__(self, root):
@@ -38,6 +39,7 @@ class ScreenCaptureApp:
         x2 = max(start_x, end_x)
         y2 = max(start_y, end_y)
         screenshot = pyautogui.screenshot(region=(x1, y1, x2 - x1, y2 - y1))
+        os.makedirs(os.path.dirname("image/screenshot.jpeg"), exist_ok=True)
         screenshot.save("image/screenshot.jpeg")
         print("スクリーンショットが保存されました: screenshot.jpeg")
 

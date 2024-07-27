@@ -3,9 +3,12 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
 import resize_image
+import json
 
-# APIキーの設定
-openai.api_key = "" 
+with open('config.json', 'r') as file:
+    config = json.load(file)
+
+openai.api_key = config['APIKEY']
 model="gpt-4o"
 
 async def search_gpt(user_input):

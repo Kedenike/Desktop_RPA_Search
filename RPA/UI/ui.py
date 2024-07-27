@@ -4,16 +4,15 @@ from PIL import Image, ImageTk
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sub_process import gpt, sc_delete
+from sub_process import gpt, sc_delete, flow
 import asyncio
 import threading
-import flow
 
 # スクリーンショットが保存された後に画像を更新するためにlaunch_wincap関数を修正
 def capture_button_tapped():
     # 最初にWindowを最小化
     root.iconify()
-    subprocess.Popen(["python", "UI/wincap.py"]).wait()
+    subprocess.Popen(["python", "RPA/UI/wincap.py"]).wait()
     update_image()
     # 最小化を解除してWindowを表示
     root.deiconify()
@@ -30,7 +29,7 @@ def update_image():
     except Exception as e:
         callback_field_ins(f"画像ファイルを認識できませんでした: {e}")
 
-def launch_gpt():
+def launch_gpt(text):
     try:
         async def wrapper(text):
             result = await gpt.search_gpt_image(text=text)
@@ -38,13 +37,7 @@ def launch_gpt():
             img_label.config(image='')
             img_label.image = None
             sc_delete.delete_screenshot()
-        
-        text = input_field.get("1.0", tk.END).strip() # こいつ挙動確認する
-        if text == "":
-            callback_field_ins("テキストが入力されていません")
-            return
 
-        callback_field_ins("呼ばれた")
         input_path = "image/screenshot.jpeg"
         img = Image.open(input_path)
         threading.Thread(target=lambda: asyncio.run(wrapper(text))).start()
@@ -53,14 +46,12 @@ def launch_gpt():
         async def wrapper(text):
             result = await gpt.search_gpt(text)
             callback_field_ins(result)
-        text = input_field.get("1.0", tk.END).strip()
         threading.Thread(target=lambda: asyncio.run(wrapper(text))).start()
             
-def launch_gpt_rpa():
+def launch_gpt_rpa(text):
     async def wrapper(text):
         await flow.flow(text)
         callback_field_ins("終わったよ")
-    text = input_field.get("1.0", tk.END).strip()
     threading.Thread(target=lambda: asyncio.run(wrapper(text))).start()
 
 
@@ -71,12 +62,21 @@ def callback_field_ins(text):
     callback_field.config(state='disabled')
 
 def search_button_tapped():
+    text = validate_input_field()
     callback_field_ins("検索中")
     selected_mode = search_mode.get()
     if selected_mode == "search":
-        launch_gpt()
+        launch_gpt(text)
     elif selected_mode == "rpa":
-        launch_gpt_rpa()
+        launch_gpt_rpa(text)
+
+def validate_input_field():
+    text = input_field.get("1.0", tk.END).strip()
+    if text == "":
+        print("発火")
+        callback_field_ins("テキストが入力されていません")
+        raise ValueError("値が空")
+    return text
 
 # ウィンドウサイズを設定
 window_width = 360

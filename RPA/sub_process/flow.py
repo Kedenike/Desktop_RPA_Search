@@ -1,8 +1,7 @@
-import asyncio
-import sub_process.check as check
-import sub_process.gpt as gpt
-import sub_process.gemini as gemini
-import sub_process.run as run
+import check as check
+import gpt as gpt
+import gemini as gemini
+import run as run
 
 async def flow(userInput):
     # userInput = "電卓を開いて、9876×12を実行するコードを書いて"
@@ -44,6 +43,9 @@ async def flow(userInput):
 
     if type(index) is int:
         result = snipets[index]
+        print("=============================")
+        print(result)
+        print("=============================")
         run.codeRun(result)
         return result
 
