@@ -1,19 +1,19 @@
 import tkinter as tk
-from PIL import ImageGrab
 import pyautogui
 import os
 
-class ScreenCaptureApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.attributes("-fullscreen", True)
-        self.root.attributes("-alpha", 0.1)
-        self.root.configure(background='black')
-        self.root.bind('<Escape>', self.close_window)
+class ScreenCaptureApp(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+        self.master = master
+        self.attributes("-fullscreen", True)
+        self.attributes("-alpha", 0.1)
+        self.configure(background='black')
+        self.bind('<Escape>', self.close_window)
         self.start_x = None
         self.start_y = None
         self.rect = None
-        self.canvas = tk.Canvas(self.root, cursor="cross", bg="black")
+        self.canvas = tk.Canvas(self, cursor="cross", bg="black")
         self.canvas.pack(fill=tk.BOTH, expand=tk.YES)
         self.canvas.bind("<ButtonPress-1>", self.on_button_press)
         self.canvas.bind("<B1-Motion>", self.on_mouse_drag)
@@ -30,8 +30,10 @@ class ScreenCaptureApp:
 
     def on_button_release(self, event):
         end_x, end_y = (event.x, event.y)
-        self.root.destroy()
+        self.master.deiconify()
         self.capture_screen(self.start_x, self.start_y, end_x, end_y)
+        self.master.on_return_capture()
+        self.destroy()
 
     def capture_screen(self, start_x, start_y, end_x, end_y):
         x1 = min(start_x, end_x)
@@ -44,10 +46,8 @@ class ScreenCaptureApp:
         print("スクリーンショットが保存されました: screenshot.jpeg")
 
     def close_window(self, event):
-        self.root.destroy()
-        
+        self.master.destroy()
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = ScreenCaptureApp(root)
-    root.mainloop()
+    app = ScreenCaptureApp()
+    app.mainloop()

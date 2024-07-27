@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
 import resize_image
 import json
 
-with open('config.json', 'r') as file:
+with open('config/config.json', 'r') as file:
     config = json.load(file)
 
 openai.api_key = config['APIKEY']
