@@ -6,7 +6,6 @@ image/
 *$py.class
 .vscode/
 
-
 # C extensions
 *.so
 
