@@ -9,7 +9,8 @@ with open('config/config.json', 'r') as file:
     config = json.load(file)
 
 openai.api_key = config['APIKEY']
-model="gpt-4o"
+# model="gpt-4o"
+model="gpt-4o-mini"
 
 async def search_gpt(user_input):
     response = openai.chat.completions.create(
@@ -28,7 +29,7 @@ async def search_gpt_for_rpa(user_input):
     response = openai.chat.completions.create(
         model = model,
         messages=[
-            {"role": "system", "content": "あなたは優れたpythonのプログラマーです。あなたは要求されたソースコードの作成をなるべく一つにまとめて回答する必要があります。"},
+            {"role": "system", "content": "あなたは優れたpythonのプログラマーです。ただし、あなたは要求されたソースコードの作成を一つにまとめて回答する必要があります。"},
             {"role": "user", "content": "pythonのpyautoguiを使って" + user_input + "をpythonのコードスニペットを提出してください" + "君ならできる！！"}
         ]
     )

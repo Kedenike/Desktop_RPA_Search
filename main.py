@@ -1,22 +1,23 @@
 import tkinter as tk
-import subprocess
 from PIL import Image, ImageTk
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sub_process import gpt, sc_delete, flow, wincap
+from sub_process import gpt, sc_delete, flow, wincap, setup
 import asyncio
 import threading
+import time
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.flag = 0 #画像ありかどうか
         # ウィンドウサイズを設定
-        window_width = 360
-        window_height = 230
+        self.window_width = 360
+        self.window_height = 230
 
         self.title("")
-        self.geometry(f"{window_width}x{window_height}")
+        self.geometry(f"{self.window_width}x{self.window_height}")
 
         main_frame = tk.Frame(self)
         main_frame.pack(fill=tk.BOTH, expand=1)
@@ -24,8 +25,8 @@ class MainWindow(tk.Tk):
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
-        x = screen_width - window_width - 5
-        y = screen_height - window_height - 80
+        x = screen_width - self.window_width - 5
+        y = screen_height - self.window_height - 80
 
         self.geometry(f"+{x}+{y}")
 
@@ -69,6 +70,8 @@ class MainWindow(tk.Tk):
 
         search_button = tk.Button(button_frame, text="検索", command=self.search_button_tapped)
         search_button.pack(side=tk.LEFT, padx=10)
+        self.withdraw()  # メインウィンドウを非表示にする
+        _ = setup.SetupWindow(self)
         
     def capture_button_tapped(self):
         self.withdraw()  # メインウィンドウを非表示にする
@@ -84,11 +87,14 @@ class MainWindow(tk.Tk):
             img = ImageTk.PhotoImage(img)
             self.img_label.config(image=img)
             self.img_label.image = img
-            self.geometry("360x330")
+            self.geometry(f"{self.window_width}x{self.window_height+100}")
+            if self.flag == 0:
+                self.geometry(f"+{self.winfo_x()}+{self.winfo_y()-100}")
+                self.flag = 1
             print("update_image")
 
-        except Exception as e:
-            self.callback_field_ins(f"画像ファイルを認識できませんでした: {e}")
+        except FileNotFoundError:
+            self.callback_field_ins("画像ファイルを認識できませんでした")
 
     def launch_gpt(self, text):
         try:
@@ -127,6 +133,9 @@ class MainWindow(tk.Tk):
         selected_mode = self.search_mode.get()
         if selected_mode == "search":
             self.launch_gpt(text)
+            self.geometry(f"{self.window_width}x{self.window_height}")
+            self.geometry(f"+{self.winfo_x()}+{self.winfo_y()+100}")
+            self.flag = 0
         elif selected_mode == "rpa":
             self.launch_gpt_rpa(text)
 

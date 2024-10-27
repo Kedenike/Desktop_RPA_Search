@@ -5,7 +5,7 @@ image/
 *.py[cod]
 *$py.class
 .vscode/
-config.json
+
 
 # C extensions
 *.so
